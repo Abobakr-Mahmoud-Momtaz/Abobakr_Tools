@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "abobakr-tools"
+version = "1.0.0"
+description = "A versatile collection of Python tools and utilities for various purposes."
+readme = "README.md"
+requires-python = ">=3.8"
+
+
+[tool.setuptools]
+include-package-data = true
+
+
+[tool.setuptools.packages.find]
+include = ["abt*"]
+
+
+[tool.setuptools.package-data]
+abt = [
+    "RANDOM_DIGITS_RAW_1_MILLION.txt",
+]
+
+
+[tool.setuptools.exclude-package-data]
+abt = [
+    "ffmpeg-7.0-full_build/*",
+    "ffmpeg-7.0-full_build/**/*",
+]
