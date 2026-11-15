@@ -2,7 +2,7 @@
 *.egg-info/
 __pycache__/
 venv/
-ffmpeg-8.0.1-full_build/
+ffmpeg-7.0-full_build/
 *.py[cod]
 .venv/
 build/
