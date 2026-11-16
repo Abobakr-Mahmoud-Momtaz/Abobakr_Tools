@@ -7,3 +7,7 @@ ffmpeg-7.0-full_build/
 .venv/
 build/
 dist/
+dist/
+test_env/
+.test_env/
+pyproject.toml
