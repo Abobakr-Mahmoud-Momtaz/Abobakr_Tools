@@ -116,14 +116,69 @@ editor.merge_videos(width=1920, height=1080)
 
 #### FFmpeg Installation
 
-FFmpeg is downloaded and configured automatically when the first `VideoEditor` instance is created.
+FFmpeg is downloaded and configured automatically when a `VideoEditor` instance is created.
 
-- No manual FFmpeg installation is required.
-- FFmpeg is downloaded from the project's GitHub Release.
-- FFmpeg files are not included in the Python package.
-- An internet connection is required for the initial download.
+**Installation behavior:**
 
-**Platform:** The current `VideoEditor` implementation uses Windows FFmpeg executables (`.exe`).
+- FFmpeg is downloaded automatically if its required executable files are missing.
+- The download is performed from an external GitHub release.
+- The downloaded ZIP archive is extracted automatically.
+- The FFmpeg files are stored inside the library directory.
+- Existing FFmpeg files are reused when all required executables are available.
+- If any required executable is missing, FFmpeg is downloaded and installed again.
+
+**Required executables:**
+
+- `ffmpeg.exe`
+- `ffprobe.exe`
+- `ffplay.exe`
+
+**FFmpeg Version:** 7.0 Full Build
+
+**Download URL:**
+
+https://github.com/GyanD/codexffmpeg/releases/download/7.0/ffmpeg-7.0-full_build.zip
+
+**Requirements:**
+
+- An active internet connection for the initial download or reinstallation.
+- Write permission in the library directory.
+- Windows operating system.
+
+FFmpeg is executed as an independent external process using Python's `subprocess` module.
+
+### Third-Party Licenses
+
+Abobakr Tools uses **FFmpeg**, an external multimedia framework developed by the FFmpeg project.
+
+The version used by this library is FFmpeg 7.0 Full Build, obtained from GyanD's GitHub releases.
+
+The downloaded FFmpeg build reports that it is distributed under the **GNU General Public License v3.0 or later (GPL-3.0-or-later)**.
+
+**FFmpeg Information:**
+
+| Item | Details |
+|---|---|
+| Project | FFmpeg |
+| Version | 7.0 Full Build |
+| Distributor | GyanD |
+| License | GPL-3.0-or-later |
+| Download | [FFmpeg 7.0 Full Build](https://github.com/GyanD/codexffmpeg/releases/download/7.0/ffmpeg-7.0-full_build.zip) |
+| Official Website | https://ffmpeg.org/ |
+| Upstream Source Code | https://github.com/FFmpeg/FFmpeg/tree/n7.0 |
+| License Text | https://www.gnu.org/licenses/gpl-3.0.html |
+
+**Important Notes:**
+
+- FFmpeg is a third-party project and is not developed by the author of Abobakr Tools.
+- FFmpeg is not modified by Abobakr Tools.
+- FFmpeg is executed as an independent external process.
+- FFmpeg and its included third-party components remain subject to their respective licenses.
+- The GPL license and applicable source-code distribution requirements must be respected when redistributing FFmpeg.
+
+For additional information about FFmpeg licensing:
+
+https://ffmpeg.org/legal.html
 
 ## Requirements
 

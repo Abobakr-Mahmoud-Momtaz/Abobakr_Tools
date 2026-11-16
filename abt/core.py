@@ -10,11 +10,11 @@ import threading
 # ==========================================
 
 (
-    events, window_start, users_attempts, login_attempts_count, reached_end, stop_event,
+    events, window_start, win_d, users_attempts, login_attempts_count, reached_end, stop_event,
     login_success_event_type, login_failed_event_type, events_count, time, time_f,
     datetime_value
 ) = (
-    {}, 0, {}, 0, False, threading.Event(), "", "", 0, "", "", 0
+    {}, 0, 0, {}, 0, False, threading.Event(), "", "", 0, "", "", 0
 )
 
 DIGIT_MAP = {
@@ -235,15 +235,13 @@ def log_user_activity():
 def wait_for_new_events(events_file_path, events_count):
     global reached_end
 
-    if stop_event.is_set() and len(events) > events_count:
-        print("Wait until the events conclude.")
-
     while len(events) <= events_count:
-        if stop_event.is_set():
-            return
 
         create_events(events_file_path)
-
+        
+        if stop_event.is_set() and len(events) <= events_count:
+            return
+    
     reached_end = False
     return get_event_time(events[-1]) - datetime.timedelta(seconds=5)
 
@@ -256,7 +254,10 @@ def find_window_end(window_start, window_end_time, end_event):
         if datetime_value > window_end_time:
             return event
 
-        elif datetime_value > end_event:
+        elif datetime_value > end_event and not any(
+            get_event_time(events[i]) > window_end_time
+            for i in range(event + 1, len(events))):
+
             reached_end = True
             return None
 
@@ -283,23 +284,25 @@ def analyze_event_windows(events_file_path, end_event):
 
         window_start = window_end
 
-def analyze_events(events_file_path, login_success_event_types, login_failed_event_types,
+def analyze_events(events_file_path, login_success_event_types, login_failed_event_types, window_duration,
                    timestamp_key="timestamp", timestamp_format="%Y-%m-%dT%H:%M:%S.%f%z"):
 
-    global events, window_start, users_attempts, login_attempts_count, reached_end
+    global events, window_start, win_d, users_attempts, login_attempts_count, reached_end
     global login_failed_event_type, login_success_event_type, events_count, time, time_f
 
-    (events_file_path, login_failed_event_type, login_success_event_type, time, time_f) = (
+    (
+        events_file_path, login_failed_event_type, login_success_event_type, time, time_f) = (
         Path(events_file_path), login_failed_event_types, login_success_event_types, timestamp_key, timestamp_format
-    ); events = create_events(events_file_path)
+    );  events = create_events(events_file_path)
 
     if not events: raise ValueError("No events found in the events file.")
 
-    (window_start, users_attempts, login_attempts_count, reached_end, end_event) = (
-        0, {}, 0, False, get_event_time(events[-1]) - datetime.timedelta(seconds=5)
+    (
+        window_start, win_d, users_attempts, login_attempts_count, reached_end, end_event) = (
+        0, 0, {}, 0, False, get_event_time(events[-1]) - datetime.timedelta(seconds=5)
     )
 
     logging.basicConfig(
         filename=events_file_path.parent / "soc_analyst.log", level=logging.INFO,
         format="%(name)s - %(levelname)s - %(asctime)s - %(message)s"
-    ); analyze_event_windows(events_file_path, end_event)
+    );  analyze_event_windows(events_file_path, end_event)

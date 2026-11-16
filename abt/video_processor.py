@@ -8,9 +8,7 @@ from pathlib import Path
 
 
 FFMPEG_URL = (
-    "https://github.com/Abobakr-Mahmoud-Momtaz/"
-    "Abobakr_Tools/releases/download/ffmpeg-7.0/"
-    "ffmpeg-7.0-full_build.zip"
+    "https://github.com/GyanD/codexffmpeg/releases/download/7.0/ffmpeg-7.0-full_build.zip"
 )
 
 ffmpeg_root = Path(__file__).parent / "ffmpeg-7.0-full_build"
