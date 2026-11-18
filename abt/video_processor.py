@@ -134,6 +134,9 @@ def execut_ffmpeg(cmd, progress_interval, size_videos,
 
                 if on_progress is not None:
                     on_progress(percentage)
+    if process.wait() == 0:
+        if on_progress is not None:
+            on_progress(100)
 
     return_code = process.wait()
 

@@ -200,6 +200,22 @@ import abt
 
 All the documented public functions and the `VideoEditor` class can be accessed through the `abt` package.
 
+## Support Abobakr Tools
+
+Thank you for using **Abobakr Tools**!
+
+I created this library to make development tasks easier and more accessible. I am continuously working hard to maintain, improve, and expand it.
+
+If Abobakr Tools has helped you earn money through freelance work, professional services, or commercial projects, I encourage you to consider supporting the project with a voluntary contribution of any amount.
+
+Your support helps me dedicate more time and effort to maintaining the library, fixing bugs, adding new features, and making it even more useful for developers.
+
+Every contribution, no matter how small, is greatly appreciated. Whether you choose to contribute or simply use the library, thank you for being part of this project!
+
+☕ **Support the Project:**
+
+[Support Abobakr Tools](https://abobakrmahmoad.gumroad.com/coffee)
+
 ## Contributing
 
 Suggestions, bug reports, and contributions are welcome.
