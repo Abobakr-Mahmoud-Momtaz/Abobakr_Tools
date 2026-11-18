@@ -7,16 +7,46 @@ import shutil
 from pathlib import Path
 
 
-FFMPEG_URL = (
-    "https://github.com/GyanD/codexffmpeg/releases/download/7.0/ffmpeg-7.0-full_build.zip"
-)
 
-ffmpeg_root = Path(__file__).parent / "ffmpeg-7.0-full_build"
+import platform
+
+
+SYSTEM = platform.system()
+
+if SYSTEM == "Windows":
+    FFMPEG_URL = (
+        "https://github.com/GyanD/codexffmpeg/releases/download/7.0/"
+        "ffmpeg-7.0-full_build.zip"
+    )
+    FFMPEG_ARCHIVE = "ffmpeg.zip"
+    FFMPEG_EXECUTABLES = [
+        "ffmpeg.exe",
+        "ffprobe.exe",
+        "ffplay.exe"
+    ]
+
+elif SYSTEM == "Linux":
+    FFMPEG_URL = (
+        "https://johnvansickle.com/ffmpeg/releases/"
+        "ffmpeg-release-amd64-static.tar.xz"
+    )
+    FFMPEG_ARCHIVE = "ffmpeg.tar.xz"
+    FFMPEG_EXECUTABLES = [
+        "ffmpeg",
+        "ffprobe",
+        "ffplay"
+    ]
+
+else:
+    raise OSError(f"Unsupported operating system: {SYSTEM}")
+
+
+ffmpeg_root = Path(__file__).parent / f"ffmpeg-{SYSTEM.lower()}"
 ffmpeg_folder = ffmpeg_root / "bin"
 
 apps_path = [
     ffmpeg_folder / app
-    for app in ["ffmpeg.exe", "ffprobe.exe", "ffplay.exe"]
+    for app in FFMPEG_EXECUTABLES
 ]
 
 ffmpeg_exe, ffprobe_exe, ffplay_exe = apps_path
@@ -32,7 +62,7 @@ def ensure_ffmpeg():
         ) as temp:
 
             temp = Path(temp)
-            archive = temp / "ffmpeg.zip"
+            archive = temp / FFMPEG_ARCHIVE
             extract_dir = temp / "extracted"
 
             extract_dir.mkdir()
@@ -48,20 +78,31 @@ def ensure_ffmpeg():
                 with open(archive, "wb") as file:
                     shutil.copyfileobj(response, file)
 
-            with zipfile.ZipFile(archive) as zip_file:
-                zip_file.extractall(extract_dir)
+            if SYSTEM == "Windows":
+                with zipfile.ZipFile(archive) as zip_file:
+                    zip_file.extractall(extract_dir)
+
+            else:
+                import tarfile
+
+                with tarfile.open(archive, "r:xz") as tar_file:
+                    tar_file.extractall(extract_dir)
 
             candidates = [
-                path for path in extract_dir.rglob("ffmpeg.exe")
-                if path.parent.name.lower() == "bin"
-                and (path.parent / "ffprobe.exe").is_file()
-                and (path.parent / "ffplay.exe").is_file()
+                path for path in extract_dir.rglob(FFMPEG_EXECUTABLES[0])
+                if all(
+                    (path.parent / app).is_file()
+                    for app in FFMPEG_EXECUTABLES[1:]
+                )
             ]
 
             if not candidates:
                 raise RuntimeError("Invalid FFmpeg archive")
 
-            source_folder = candidates[0].parent.parent
+            source_folder = candidates[0].parent
+
+            if SYSTEM == "Windows":
+                source_folder = source_folder.parent
 
             if ffmpeg_root.exists():
                 if ffmpeg_root.is_dir():
@@ -69,7 +110,25 @@ def ensure_ffmpeg():
                 else:
                     ffmpeg_root.unlink()
 
-            shutil.move(str(source_folder), str(ffmpeg_root))
+            if SYSTEM == "Windows":
+                shutil.move(str(source_folder), str(ffmpeg_root))
+
+            else:
+                ffmpeg_folder.mkdir(parents=True, exist_ok=True)
+
+                shutil.move(
+                    str(source_folder / "ffmpeg"),
+                    str(ffmpeg_folder / "ffmpeg")
+                )
+
+                for app in FFMPEG_EXECUTABLES[1:]:
+                    shutil.move(
+                        str(source_folder / app),
+                        str(ffmpeg_folder / app)
+                    )
+
+                for app in apps_path:
+                    app.chmod(0o755)
 
     except PermissionError as error:
         raise PermissionError(
@@ -79,6 +138,7 @@ def ensure_ffmpeg():
 
     if not all(map(Path.is_file, apps_path)):
         raise RuntimeError("FFmpeg installation failed")
+
 
 
 def execut_ffprobe(cmd):
