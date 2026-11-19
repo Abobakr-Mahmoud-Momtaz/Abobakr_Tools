@@ -36,7 +36,6 @@ random_digit_index = 0
 # 2. String & List Manipulation
 # ==========================================
 
-
 remove_all_occurrences = lambda items, item: [x for x in items if x != item]
 
 def insert_text_after_in_file(file_path, insert_text, target_text):
